@@ -8,7 +8,8 @@ resource "aws_vpc" "coust" {
 
 #creation of internet gateway
 resource "aws_internet_gateway" "name" {
-    vpc_id = aws_vpc.coust.id
+        vpc_id = aws_vpc.coust.id
+
     tags = {
       name="ig"
     }
@@ -17,7 +18,7 @@ resource "aws_internet_gateway" "name" {
 #create subnets 
 resource "aws_subnet" "public_sub" {
     vpc_id = aws_vpc.coust.id
-    cidr_block = "10.0.0.0/16"
+    cidr_block = "10.0.0.0/24"
     tags = {
       name="sub_1"
     }
@@ -26,7 +27,7 @@ resource "aws_subnet" "public_sub" {
 
   resource "aws_subnet" "private_sub" {
     vpc_id = aws_vpc.coust.id
-    cidr_block = "10.0.0.0/21"
+    cidr_block = "10.0.8.0/24"
     tags = {
       name="sub_2"
     }
@@ -42,11 +43,17 @@ route {
 }    
  
 }
+# creation of elastic ip
+resource "aws_eip" "elastic" {
+  instance = "{aws_instance.in.id}"
+  domain = "vpc"
+}
+
   
 #create natgateway
 resource "aws_nat_gateway" "ng" {
     subnet_id = aws_subnet.private_sub.id
-    allocation_id = aws_subnet.private_sub.id
+    allocation_id = aws_eip.elastic.id
   tags = {
     names = "natgate"
   }
