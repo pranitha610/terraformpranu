@@ -85,7 +85,7 @@ egress {
 
 resource "aws_instance" "in" {
     ami = "ami-0d07675d294f17973"
-    instance_type = "t2.micro"
+    instance_type = "t2.micr0"
     key_name = "singapore"
     vpc_security_group_ids = [aws_security_group.traffic.id]
     subnet_id = aws_subnet.public_sub.id
