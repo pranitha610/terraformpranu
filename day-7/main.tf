@@ -7,6 +7,7 @@ resource "aws_instance" "devvv" {
 
 resource "aws_s3_bucket" "east" {
     bucket = "eastwedd"
+    depends_on = [ aws_instance.devvv ]
   
 }
 
