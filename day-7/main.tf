@@ -5,8 +5,8 @@ resource "aws_instance" "devvv" {
  }
 
 
-resource "aws_s3_bucket" "wedd" {
-    bucket = "wedd"
+resource "aws_s3_bucket" "east" {
+    bucket = "eastwedd"
   
 }
 
