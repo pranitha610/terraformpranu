@@ -1,23 +1,40 @@
-### targeted groups ----
-resource "aws_lb_target_group" "tg" {
-  name     = "tg"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.coust.id
-  tags = {
-    name = "tg"
-  }
-}
+#created a targt group for alb
+resource "aws_lb_target_group" "TG" {
+  name        = "myTG"
+  target_type = "instance"
+  protocol    = "HTTP"
+  port        = "80"
+  vpc_id      = aws_vpc.coust.id
 
-#### elb ----------
-resource "aws_lb" "elb" {
-  name               = "elb"
+  protocol_version = "HTTP1"
+  depends_on       = [aws_vpc.coust]
+  tags = {
+    Name = "myTG"
+  }
+
+
+}
+#created a LB application load blancer and added target group to alb listener
+resource "aws_lb" "name" {
+  name               = "myALB"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg.id]
-  subnets            = [aws_subnet.private_sub.id, aws_subnet.public_sub.id]
-  depends_on = [ aws_lb_target_group.tg ]
+  subnets            = [aws_subnet.public_sub.id,aws_subnet.private_sub.id]
+  depends_on         = [aws_lb_target_group.TG]
   tags = {
-     name = "myelb"
+    Name = "myALB"
   }
+}
+#added target group to alb listener
+resource "aws_lb_listener" "alb" {
+  load_balancer_arn = aws_lb.name.arn
+  protocol          = "HTTP"
+  port              = "80"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.TG.arn
+  }
+  depends_on = [aws_lb_target_group.TG]
 }

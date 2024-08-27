@@ -10,6 +10,9 @@ resource "aws_vpc" "coust" {
 resource "aws_subnet" "public_sub" {
     vpc_id = aws_vpc.coust.id
     cidr_block = "10.0.0.0/28"
+    availability_zone = "ap-south-1b"
+    depends_on = [aws_vpc.coust]
+
     tags = {
       name="sub_1"
     }
@@ -18,32 +21,24 @@ resource "aws_subnet" "public_sub" {
 resource "aws_subnet" "private_sub" {
     vpc_id = aws_vpc.coust.id
     cidr_block = "10.0.0.192/27"
+    availability_zone = "ap-south-1a"
+    depends_on = [aws_vpc.coust]
+
     tags = {
       name="sub_2"
     }
   }  
 
-###--------------elastic ip allocation ---------------
-resource "aws_eip" "elastic" {
-    instance = aws_instance.web.id
-    domain   = "vpc"
-}
+
 
 #### -----------------creation of internat gateways-----
 resource "aws_internet_gateway" "ig" {
         vpc_id = aws_vpc.coust.id
+        depends_on = [aws_vpc.coust]
 
     tags = {
       name="ig"
     }
-}
-#### -----------------nat gateway---------------
-resource "aws_nat_gateway" "ng" {
-    subnet_id = aws_subnet.public_sub.id
-    allocation_id = aws_eip.elastic.id
-  tags = {
-    names = "natgate"
-  }
 }
 
 ##---------------# create route table and attach to ig
@@ -52,10 +47,9 @@ resource "aws_route_table" "name" {
 route {
     gateway_id = aws_internet_gateway.ig.id
     cidr_block = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.ng.id
-    carrier_gateway_id = "0.0.0.0/8"
-     } 
-}   
+    
+}  
+} 
  
 
 ## -----------creation of instance------------
@@ -64,7 +58,6 @@ resource "aws_instance" "web" {
     instance_type = "t2.micro"
     key_name = "sid"
     vpc_security_group_ids = [aws_security_group.sg.id]
-    subnet_id = aws_subnet.public_sub.id
         tags = {
       name = "web"
     }
@@ -74,7 +67,7 @@ resource "aws_instance" "web" {
 #### -----------------creating security grp -----------#
 resource "aws_security_group" "sg" {
     name = "sg"
-    vpc_id = aws_vpc.coust.id
+    depends_on = [ aws_vpc.coust ]
     tags = {
       name = "sg"
     }
@@ -86,6 +79,14 @@ ingress {
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
 }
+
+ingress {
+    description = "https"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
 
 egress {
