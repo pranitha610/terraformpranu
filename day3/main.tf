@@ -1,7 +1,7 @@
 resource "aws_instance" "name" {
-    ami= "ami-025258b26b492aec6"
+    ami= "ami-04a5ce820a419d6da"
     instance_type = "t2.micro"
-    key_name = "webb"
+    key_name = "my-key"
     tags = {
     Name = "testbackend"
   }
