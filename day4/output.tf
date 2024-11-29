@@ -1,3 +1,4 @@
-output "public_ip" {
-    value = aws_instance.name.public_ip
-  }
+output "publicip" {
+    value = aws_instance.in.id
+    description = "printing the public ip"
+}
