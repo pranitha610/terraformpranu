@@ -18,7 +18,7 @@ resource "aws_dynamodb_table" "dynamodb-lock" {
   write_capacity = 20
  
   attribute {
-    name = "LockID"
+    name = "lockID"
     type = "S"
   }
 } 
